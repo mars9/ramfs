@@ -8,9 +8,9 @@ simple 9P2000 services from within scripts.
 Options:
   -addr="localhost:5640": service network address
   -aname="": attach to the file system named aname
-  -crypt=false: use AES en-/decryption
   -d=false: make directories
   -l=false: use a long listing format
+  -net="tcp": connect on the named network
   -snappy=false: use snappy en-/decompression
   -uname="$USER": username (default: $USER)
 

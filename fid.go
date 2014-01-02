@@ -37,6 +37,12 @@ func (f *Fid) decRef() uint16 {
 	return f.ref
 }
 
+func (f *Fid) refCount() uint16 {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+	return f.ref
+}
+
 func (f *Fid) isOpen() bool {
 	f.mu.RLock()
 	defer f.mu.RUnlock()

@@ -20,12 +20,13 @@ const (
 )
 
 var (
-	addr  = flag.String("addr", "localhost:5640", "service network address")
-	mkdir = flag.Bool("d", false, "make directories")
-	long  = flag.Bool("l", false, "use a long listing format")
-	uname = flag.String("uname", os.Getenv("USER"), "username (default: $USER)")
-	aname = flag.String("aname", "", "attach to the file system named aname")
-	comp  = flag.Bool("snappy", false, "use snappy en-/decompression")
+	addr    = flag.String("addr", "localhost:5640", "service network address")
+	network = flag.String("net", "tcp", "connect on the named network")
+	mkdir   = flag.Bool("d", false, "make directories")
+	long    = flag.Bool("l", false, "use a long listing format")
+	uname   = flag.String("uname", os.Getenv("USER"), "username (default: $USER)")
+	aname   = flag.String("aname", "", "attach to the file system named aname")
+	comp    = flag.Bool("snappy", false, "use snappy en-/decompression")
 )
 
 const usageMsg = `
@@ -127,7 +128,11 @@ func main() {
 		}
 	}
 
-	conn, err := client.Dial("tcp", *addr)
+	if *network == "unix" {
+		ns := client.Namespace()
+		*addr = fmt.Sprintf("%s%s%s", ns, string(os.PathSeparator), *addr)
+	}
+	conn, err := client.Dial(*network, *addr)
 	if err != nil {
 		xprint(1, "%s\n", err.Error())
 	}

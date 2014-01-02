@@ -260,6 +260,7 @@ func (fs *FS) Listen(network, addr string) error {
 		conn:    uint32(0),
 		connmap: make(map[uint32]bool),
 	}
+	go srv.Listen()
 
 	listener, err := net.Listen(network, addr)
 	if err != nil {
@@ -277,7 +278,6 @@ func (fs *FS) Listen(network, addr string) error {
 			continue
 		}
 
-		go srv.Listen()
 		go func(rwc net.Conn, id uint32) {
 			defer srv.delConn(id)
 			conn := &conn{
