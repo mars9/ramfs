@@ -280,6 +280,7 @@ func stat(fs *client.Fsys, args []string) {
 		d, err := fs.Stat(name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "stat %s: %v\n", name, err)
+			continue
 		}
 		fmt.Printf("%s\n", d)
 	}

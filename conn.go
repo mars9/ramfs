@@ -143,6 +143,10 @@ func (c *conn) proc(req *request, reqout chan<- *request) {
 	case plan9.Rwalk, plan9.Rclunk:
 		req.Fid.decRef()
 		c.DelFid(req.Fid.num)
+	case plan9.Rerror:
+		if req.Fid != nil {
+			req.Fid.decRef()
+		}
 	default:
 		req.Fid.decRef()
 	}

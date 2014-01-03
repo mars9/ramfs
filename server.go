@@ -54,9 +54,11 @@ func (s *server) Version(fid *Fid, tx, rx *plan9.Fcall) error {
 	} else {
 		rx.Msize = tx.Msize
 	}
-	if tx.Version != plan9.VERSION9P {
-		return perror("unknown 9P version")
-	}
+	//if tx.Version != plan9.VERSION9P {
+	//	return perror("unknown 9P version")
+	//}
+	rx.Version = plan9.VERSION9P
+
 	return nil
 }
 
