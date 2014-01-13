@@ -19,6 +19,7 @@ Commands:
   chmod mode file...  - change file modes
   create [-d] file... - make directories or files
   ls [-l] file        - list contents of directory of file
+  mount mntpt         - mount remote filesystem
   noop                - send attach request
   read file...        - write the contents of file to stdout
   stat file...        - write status information to stdout

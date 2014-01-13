@@ -78,6 +78,9 @@ func usage() {
 		names = append(names, name)
 		help[name] = c.help
 	}
+	names = append(names, "mount mntpt")
+	help["mount mntpt"] = "mount remote filesystem"
+
 	sort.Strings(names)
 	for _, n := range names {
 		fmt.Fprintf(os.Stderr, "  %-*s - %s\n", max, n, help[n])
@@ -99,6 +102,14 @@ func main() {
 	xprint := func(code int, format string, a ...interface{}) {
 		fmt.Fprintf(os.Stderr, format, a...)
 		os.Exit(code)
+	}
+
+	if name == "mount" {
+		if len(args) != 1 {
+			xprint(2, "mount requires 1 argument\n")
+		}
+		cmount(args)
+		os.Exit(0)
 	}
 
 	cmd, found := cmds[name]
@@ -429,5 +440,11 @@ func readdir(fs *client.Fsys, args []string) {
 		} else {
 			fmt.Printf("%s\n", d.Name)
 		}
+	}
+}
+
+func cmount(args []string) {
+	if err := mount(*network, *addr, *uname, args[0]); err != nil {
+		fmt.Fprintf(os.Stderr, "mount %s: %v\n", *addr, err)
 	}
 }
