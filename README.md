@@ -42,7 +42,7 @@ To create a new group sys (with no home directory) and add gnot to it:
     echo uname sys :sys | racon write /adm/group
     echo uname sys +gnot | racon write /adm/group
 
-Listen manages the network addresses at which fossil is listening.
+Listen manages the network addresses at which ramfs is listening.
 
     echo listen tcp localhost:5641 | racon write /adm/ctl
 
