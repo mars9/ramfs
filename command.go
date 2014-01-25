@@ -88,15 +88,18 @@ type command struct {
 
 type group struct {
 	mu       sync.RWMutex
+	fs       *FS
 	groupmap groupmap
 }
 
-func newGroup(owner string) *group {
-	return &group{groupmap: groupmap{
-		"adm":  user{"adm", "adm", member{owner: true}},
-		"none": user{"none", "none", member{}},
-		owner:  user{owner, owner, member{}},
-	}}
+func newGroup(fs *FS, owner string) *group {
+	return &group{
+		fs: fs,
+		groupmap: groupmap{
+			"adm":  user{"adm", "adm", member{owner: true}},
+			"none": user{"none", "none", member{}},
+			owner:  user{owner, owner, member{}},
+		}}
 }
 
 func (f *group) Get(uid string) (user, error) {
@@ -147,6 +150,9 @@ func (f *group) WriteAt(p []byte, offset int64) (int, error) {
 	case len(cmd.Args[1]) > 1 && cmd.Args[1][0] == '+':
 		err = f.groupmap.GroupAdd(cmd.Args[0], cmd.Args[1][1:])
 	case cmd.Args[0] == cmd.Args[1]:
+		if err = f.fs.createHome(cmd.Args[0]); err != nil {
+			return 0, err
+		}
 		err = f.groupmap.UserAdd(cmd.Args[0])
 	case len(cmd.Args[1]) > 1 && cmd.Args[1][0] == ':':
 		err = f.groupmap.UserAdd(cmd.Args[0])

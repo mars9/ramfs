@@ -1,5 +1,5 @@
 /*
-Package ramfs implements 9P2000 file server keeping all files in
+Package ramfs implements a 9P2000 file server keeping all files in
 memory.
 
 A 9P2000 server is an agent that provides one or more hierarchical
@@ -96,9 +96,9 @@ func New(hostowner string) *FS {
 		path:      uint64(4),
 		pathmap:   make(map[uint64]bool),
 		fidnew:    make(chan (chan *Fid)),
-		group:     newGroup(owner),
 		hostowner: owner,
 	}
+	fs.group = newGroup(fs, owner)
 
 	root := newNode(fs, "/", owner, "adm", 0755|plan9.DMDIR, 0, nil)
 	adm := newNode(fs, "adm", "adm", "adm", 0770|plan9.DMDIR, 1, nil)
@@ -112,6 +112,10 @@ func New(hostowner string) *FS {
 	adm.parent = root
 	group.parent = adm
 	ctl.parent = adm
+	if owner != "adm" {
+		n := newNode(fs, owner, owner, owner, 0750|plan9.DMDIR, 4, nil)
+		root.children[owner] = n
+	}
 
 	fs.root = root
 	go fs.newFid(fs.fidnew)
@@ -172,6 +176,18 @@ func (fs *FS) walk(name string) (*node, error) {
 		return nil, err
 	}
 	return base, nil
+}
+
+func (fs *FS) createHome(uid string) error {
+	path, err := fs.newPath()
+	if err != nil {
+		return err
+	}
+	n := newNode(fs, uid, uid, uid, 0750|plan9.DMDIR, path, nil)
+	fs.root.mu.Lock()
+	fs.root.children[uid] = n
+	fs.root.mu.Unlock()
+	return nil
 }
 
 // See http://godoc.org/github.com/mars9/ramfs#Fid
