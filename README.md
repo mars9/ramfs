@@ -1,5 +1,7 @@
 # RAMFS
 
+[![Build Status](https://travis-ci.org/mars9/ramfs.png?branch=master)](https://travis-ci.org/mars9/ramfs)
+
 Ramfs starts a 9P2000 file server keeping all files in memory. The
 filesystem is entirely maintained in memory, no external storage is
 used. File data is allocated in 2 MiB blocks.
