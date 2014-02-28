@@ -235,7 +235,7 @@ func (n *node) Wstat(uname string, dir *plan9.Dir) error {
 	parent := n.parent
 	if dir.Name != "" && dir.Name != n.dir.Name {
 		if !parent.HasPerm(uname, plan9.DMWRITE) {
-			return perror("permission denied")
+			return errPerm
 		}
 
 		parent.mu.Lock()
