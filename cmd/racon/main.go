@@ -174,7 +174,6 @@ var cmds = map[string]cmd{
 	"stat":   cmd{stat, 3, "", "write status information to stdout"},
 	"chgrp":  cmd{chgrp, 4, "group", "change file group"},
 	"chmod":  cmd{chmod, 4, "mode", "change file modes"},
-	//"rename": cmd{rename, 2, "name", "rename file"},
 }
 
 func noop(fs *client.Fsys, args []string) {}
@@ -331,9 +330,6 @@ func chmod(fs *client.Fsys, args []string) {
 		}
 	}
 }
-
-// TODO
-//func rename(fs *client.Fsys, args []string) {}
 
 func timeStamp(dtime uint32) string {
 	now := time.Now()
