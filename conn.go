@@ -63,9 +63,7 @@ func (c *conn) DelFid(num uint32) {
 
 func (c *conn) setErr(err error) {
 	c.x.Lock()
-	if err == nil {
-		c.err = err
-	}
+	c.err = err
 	c.x.Unlock()
 }
 
