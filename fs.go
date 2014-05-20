@@ -32,6 +32,8 @@ import (
 )
 
 const maxPath = uint64(1<<64 - 1)
+
+// RamFS constants and limits.
 const (
 	MSIZE = 128*1024 + plan9.IOHDRSZ // maximum message size
 	// maximum size that is guaranteed to be transferred atomically
@@ -122,13 +124,14 @@ func New(hostowner string) *FS {
 	return fs
 }
 
+// Halt closes the filesystem, rendering it unusable for I/O.
 func (fs *FS) Halt() error { return nil }
 
 func (fs *FS) newPath() (uint64, error) {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
-	for path, _ := range fs.pathmap {
+	for path := range fs.pathmap {
 		delete(fs.pathmap, path)
 		return path, nil
 	}
@@ -288,7 +291,7 @@ func (fs *FS) Listen(network, addr string) error {
 		if err != nil {
 			continue
 		}
-		connId, err := srv.newConn()
+		connID, err := srv.newConn()
 		if err != nil {
 			rwc.Close()
 			continue
@@ -307,7 +310,7 @@ func (fs *FS) Listen(network, addr string) error {
 				conn.log = fs.Log
 			}
 			conn.send(conn.recv())
-		}(rwc, connId)
+		}(rwc, connID)
 	}
 }
 

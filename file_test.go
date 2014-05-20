@@ -62,7 +62,7 @@ func TestWriteRead(t *testing.T) {
 	}
 
 	// test io.EOF
-	data := make([]byte, 0)
+	var data []byte
 	_, err := f.ReadAt(data, 9999)
 	if err != io.EOF {
 		t.Fatalf("io.EOF: expected io.EOF, got %v", err)

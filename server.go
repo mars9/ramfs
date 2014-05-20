@@ -25,7 +25,7 @@ func (s *server) newConn() (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	for conn, _ := range s.connmap {
+	for conn := range s.connmap {
 		delete(s.connmap, conn)
 		return conn, nil
 	}

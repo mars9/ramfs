@@ -16,7 +16,7 @@ type user struct {
 
 func (u user) Bytes() []byte {
 	member := ""
-	for m, _ := range u.Member {
+	for m := range u.Member {
 		member += (m + ",")
 	}
 	if member != "" {
@@ -41,16 +41,16 @@ func (g groupmap) GroupAdd(uid string, gid ...string) error {
 	if _, found := g[uid]; !found {
 		return perror("user " + uid + " not found")
 	}
-	for _, groupId := range gid {
-		if _, found := g[groupId]; !found {
-			return perror("group " + groupId + " not found")
+	for _, groupID := range gid {
+		if _, found := g[groupID]; !found {
+			return perror("group " + groupID + " not found")
 		}
 	}
-	for _, groupId := range gid {
-		if groupId == uid {
+	for _, groupID := range gid {
+		if groupID == uid {
 			continue
 		}
-		g[groupId].Member[uid] = true
+		g[groupID].Member[uid] = true
 	}
 	return nil
 }

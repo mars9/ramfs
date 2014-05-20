@@ -204,7 +204,7 @@ func (n *node) Readdir() ([]byte, error) {
 		return nil, perror("not a directory")
 	}
 
-	data := make([]byte, 0)
+	var data []byte
 	for _, f := range n.children {
 		buf, err := f.dir.Bytes()
 		if err != nil {
