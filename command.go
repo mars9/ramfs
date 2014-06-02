@@ -87,7 +87,7 @@ type command struct {
 }
 
 type group struct {
-	mu       sync.RWMutex
+	mu       sync.Mutex
 	fs       *FS
 	groupmap groupmap
 }
@@ -103,8 +103,8 @@ func newGroup(fs *FS, owner string) *group {
 }
 
 func (f *group) Get(uid string) (user, error) {
-	f.mu.RLock()
-	defer f.mu.RUnlock()
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	user, found := f.groupmap[uid]
 	if !found {
 		return user, perror("user " + uid + " not found")
@@ -117,13 +117,13 @@ func (f *group) ReadAt(p []byte, offset int64) (int, error) {
 		return 0, perror("negative offset")
 	}
 
-	f.mu.RLock()
+	f.mu.Lock()
 	data, err := marshal(f.groupmap)
 	if err != nil {
-		f.mu.RUnlock()
+		f.mu.Unlock()
 		return 0, err
 	}
-	f.mu.RUnlock()
+	f.mu.Unlock()
 
 	if offset > int64(len(data)) {
 		return 0, io.EOF
