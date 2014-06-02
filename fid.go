@@ -102,7 +102,7 @@ func (f *Fid) Close() error {
 // The names . and .. are special; it is illegal to create files with
 // these names.
 func (f *Fid) Create(name string, mode uint8, perm Perm) error {
-	if !f.node.HasPerm(f.uid, plan9.Perm(perm)) {
+	if !f.node.HasPerm(f.uid, plan9.DMWRITE) {
 		return errPerm
 	}
 
