@@ -95,7 +95,7 @@ func New(hostowner string) *FS {
 		owner = "adm"
 	}
 	fs := &FS{
-		path:      uint64(4),
+		path:      uint64(5),
 		pathmap:   make(map[uint64]bool),
 		fidnew:    make(chan (chan *Fid)),
 		hostowner: owner,
@@ -116,6 +116,7 @@ func New(hostowner string) *FS {
 	ctl.parent = adm
 	if owner != "adm" {
 		n := newNode(fs, owner, owner, owner, 0750|plan9.DMDIR, 4, nil)
+		n.parent = root
 		root.children[owner] = n
 	}
 
