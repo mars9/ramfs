@@ -36,7 +36,8 @@ const maxPath = uint64(1<<64 - 1)
 // RamFS constants and limits.
 const (
 	MSIZE = 128*1024 + plan9.IOHDRSZ // maximum message size
-	// maximum size that is guaranteed to be transferred atomically
+	// IOUNIT represents the maximum size that is guaranteed to be
+	// transferred atomically.
 	IOUNIT    = 128 * 1024
 	BLOCKSIZE = 2 * 1024 * 1024 // maximum block size
 
@@ -66,8 +67,10 @@ const (
 	DMEXEC   = plan9.DMEXEC   // mode bit for execute permission
 )
 
+// LogFunc can be used to enable a trace of general debugging messages.
 type LogFunc func(format string, v ...interface{})
 
+// FS represents a a 9P2000 file server.
 type FS struct {
 	mu        sync.Mutex
 	path      uint64
@@ -194,7 +197,9 @@ func (fs *FS) createHome(uid string) error {
 	return nil
 }
 
-// See http://godoc.org/github.com/mars9/ramfs#Fid
+// Attach identifies the user and may select the file tree to access. As
+// a result of the attach transaction, the client will have a connection
+// to the root directory of the desired file tree, represented by Fid.
 func (fs *FS) Attach(uname, aname string) (*Fid, error) {
 	user, err := fs.group.Get(uname)
 	if err != nil {
@@ -210,7 +215,22 @@ func (fs *FS) Attach(uname, aname string) (*Fid, error) {
 	return &Fid{uid: uid, node: node}, nil
 }
 
-// See http://godoc.org/github.com/mars9/ramfs#Fid.Create
+// Create asks the file server to create a new file with the name
+// supplied, in the directory represented by fid, and requires write
+// permission in the directory. The owner of the file is the implied user
+// id of the request, the group of the file is the same as dir, and the
+// permissions are the value of
+//   perm = (perm &^ 0666) | (dir.Mode & 0666)
+// if a regular file is being created and
+//   perm = (perm &^ 0777) | (dir.Mode & 0777)
+// if a directory is being created.
+//
+// Finally, the newly created file is opened according to mode, and fid
+// will represent the newly opened file. Directories are created by
+// setting the DMDIR bit (0x80000000) in the perm.
+//
+// The names . and .. are special; it is illegal to create files with
+// these names.
 func (fs *FS) Create(name string, mode uint8, perm Perm) (*Fid, error) {
 	user, err := fs.group.Get(fs.hostowner)
 	if err != nil {
@@ -233,7 +253,22 @@ func (fs *FS) Create(name string, mode uint8, perm Perm) (*Fid, error) {
 	return &Fid{uid: uid, node: node}, nil
 }
 
-// See http://godoc.org/github.com/mars9/ramfs#Fid.Open
+// Open asks the file server to check permissions and prepare a fid for
+// I/O with subsequent read and write messages. The mode field determines
+// the type of I/O: OREAD, OWRITE, ORDWR, and OEXEC mean read access,
+// write access, read and write access, and execute access, to be checked
+// against the permissions for the file.
+//
+// In addition, if mode has the OTRUNC bit set, the file is to be
+// truncated, which requires write permission (if the file is
+// append–only, and permission is granted, the open succeeds but the file
+// will not be truncated); if the mode has the ORCLOSE bit set, the file
+// is to be removed when the fid is clunked, which requires permission to
+// remove the file from its directory.
+//
+// It is illegal to write a directory, truncate it, or attempt to remove
+// it on close. If the file is marked for exclusive use, only one client
+// can have the file open at any time.
 func (fs *FS) Open(name string, mode uint8) (*Fid, error) {
 	user, err := fs.group.Get(fs.hostowner)
 	if err != nil {
@@ -254,7 +289,8 @@ func (fs *FS) Open(name string, mode uint8) (*Fid, error) {
 	return fid, nil
 }
 
-// See http://godoc.org/github.com/mars9/ramfs#Fid.Remove
+// Remove asks the file server both to remove the file represented by fid
+// and to clunk the fid, even if the remove fails.
 func (fs *FS) Remove(name string) error {
 	user, err := fs.group.Get(fs.hostowner)
 	if err != nil {
@@ -272,6 +308,8 @@ func (fs *FS) Remove(name string) error {
 	return fid.Remove()
 }
 
+// Listen listens on the given network address and then serves incoming
+// requests.
 func (fs *FS) Listen(network, addr string) error {
 	work := make(chan *transaction)
 	srv := &server{
@@ -328,6 +366,8 @@ func split(path string) []string {
 
 // Copied from http://goplan9.googlecode.com/hg/plan9/dir.go
 //   http://godoc.org/code.google.com/p/goplan9/plan9#Perm
+
+// Perm represents file/directory permissions.
 type Perm uint32
 
 type permChar struct {

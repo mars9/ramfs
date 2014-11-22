@@ -49,8 +49,11 @@ func (f *Fid) isOpen() bool {
 	return f.opened
 }
 
+// WalkFunc is the type of the function called for each file or directory
+// visited by Walk.
 type WalkFunc func(fid *Fid, path []string) error
 
+// Walk walks the file tree.
 func (f *Fid) Walk(name []string, fn WalkFunc) error {
 	if len(name) > plan9.MAXWELEM {
 		return perror("too many names in walk")
