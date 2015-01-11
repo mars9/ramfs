@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"code.google.com/p/goplan9/plan9"
+	"9fans.net/go/plan9"
 )
 
 func writeTest(t *testing.T, file *node) {

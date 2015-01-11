@@ -3,7 +3,7 @@ package ramfs
 import (
 	"sync"
 
-	"code.google.com/p/goplan9/plan9"
+	"9fans.net/go/plan9"
 )
 
 // The Fid type identifies a file on the file server. A new Fid is

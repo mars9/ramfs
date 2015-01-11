@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"code.google.com/p/goplan9/plan9"
+	"9fans.net/go/plan9"
 )
 
 func TestPermission(t *testing.T) {
