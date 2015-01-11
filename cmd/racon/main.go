@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"code.google.com/p/goplan9/plan9"
-	"code.google.com/p/goplan9/plan9/client"
+	"9fans.net/go/plan9"
+	"9fans.net/go/plan9/client"
 	"code.google.com/p/snappy-go/snappy"
 )
 
